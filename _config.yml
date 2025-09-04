@@ -1,0 +1,10 @@
+title: "Collision-Free Model Predictive Control with Diffusion Model Warm-Starting"
+description: "Anonymized project page for RA-L"
+remote_theme: pages-themes/cayman@v0.2.0
+plugins:
+  - jekyll-remote-theme
+
+# hide the default “View on GitHub / Download” buttons
+show_downloads: false
+github:
+  is_project_page: false

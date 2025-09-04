@@ -1,0 +1,24 @@
+<header class="page-header" role="banner">
+  <h1 class="project-name">{{ page.title | default: site.title }}</h1>
+  <h2 class="project-tagline">{{ page.description | default: site.description }}</h2>
+
+  <div class="button-row">
+    <a class="btn btn-disabled" href="#" aria-disabled="true">📄 Paper (Coming Soon)</a>
+    <a class="btn" href="https://anonymous.4open.science/r/REPLACE_WITH_YOUR_ID"
+       target="_blank" rel="noopener">💻 Code</a>
+  </div>
+</header>
+
+<style>
+.button-row {
+  margin-top: 12px;
+  display: inline-flex;
+  gap: 12px;
+}
+.btn-disabled {
+  background: #cfcfcf;
+  color: #fff;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+</style>
