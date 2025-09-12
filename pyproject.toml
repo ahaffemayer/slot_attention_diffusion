@@ -5,9 +5,21 @@ build-backend = "flit_core.buildapi"
 [project]
 name =  "conditional_diffusion_motion"
 authors = [
-{ name = "anon", email = "anon" }]
+{ name = "anon", email = "anonymous4science42@gmail.com" }]
 description = "A package to simulate diffusion motion with conditional diffusion"
 readme = "README.md"
+
+dependencies = [
+  "natsort>=7.0.0",
+    "torch>=2.5.0",
+    "torchvision>=0.20",
+    "einops>=0.8",
+    "pytorch-lightning>=2.4",
+    "diffusers>=0.31",
+    "meshcat>=0.3"
+]
+
+
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",

@@ -86,7 +86,7 @@ def sample_valid_initial_and_goal():
 
 ### Paths ###
 
-data_dir = Path(__file__).parent.parent.parent / "ressources" / "shelf_example"
+data_dir = Path(__file__).parent.parent / "ressources" / "shelf_example"
 file = data_dir / "trajectories" / "trajectories_data_shelf.json"
 
 # Load configuration and models
