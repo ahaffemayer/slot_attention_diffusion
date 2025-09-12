@@ -16,7 +16,7 @@ wget "https://osf.io/jsr7u/?view_only=92190681e4134f6798f1105ff63f7b56" -O resso
 Once downloaded, extract the contents with:
 
 ```bash
-unzip ressources.zip -d ressources
+unzip ressources.zip
 ```
 
 ## Code
