@@ -26,5 +26,10 @@ The core implementation of Conditional Diffusion Motion is included in this repo
 To run the example:
 
 ```bash
-python main_shelf_slot_attention.py
+uv run examples/main_shelf_slot_attention.py
+```
+
+and
+```bash
+uv run meshcat-server
 ```
