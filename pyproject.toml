@@ -3,6 +3,7 @@ requires = ["uv_build>=0.8.2,<0.9.0"]
 build-backend = "uv_build"
 
 [project]
+authors = [{ name = "anon", email = "anonymous4science42@gmail.com" }]
 name = "conditional_diffusion_motion"
 version = "0.1.0"
 description = "Simulate diffusion motion with conditional diffusion"
