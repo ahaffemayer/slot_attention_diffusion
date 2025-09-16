@@ -23,8 +23,23 @@ unzip ressources.zip
 The core implementation of Conditional Diffusion Motion is included in this repository.
 
 ## Example
-To run the example:
+To run the example with [uv](https://docs.astral.sh/uv/getting-started/installation/):
 
 ```bash
-python main_shelf_slot_attention.py
+uv run examples/main_shelf_slot_attention.py
+```
+and
+```bash
+uv run meshcat-server
+```
+
+And open the meschat link on your webbrowser.
+
+## Docker
+
+A Dockerfile is also provided. To use it:
+
+```bash
+docker build -t conditional_diffusion_motion .
+docker run -p 7000:7000 --rm -it conditional_diffusion_motion
 ```
