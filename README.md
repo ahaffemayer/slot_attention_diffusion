@@ -14,12 +14,6 @@ curl -L "https://osf.io/download/jyvfa/?view_only=92190681e4134f6798f1105ff63f7b
 unzip resources.zip
 ```
 
-Once downloaded, extract the contents with:
-
-```bash
-unzip ressources.zip
-```
-
 ## Code
 The core implementation of Conditional Diffusion Motion is included in this repository.
 
