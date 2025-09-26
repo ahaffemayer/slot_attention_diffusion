@@ -3,15 +3,15 @@
 This repository contains the code and resources for the paper submission.
 
 ## Dataset and Resources
-The full dataset and additional resources are available via OSF at the following **anonymous link**:
+The full dataset and additional resources are hosted on OSF and accessible through an anonymous review link:
 
 🔗 [Download resources (OSF)](https://osf.io/jsr7u/?view_only=92190681e4134f6798f1105ff63f7b56)
 
-For direct command-line access:
+For direct command-line download:
 
 ```bash
- curl -L "https://osf.io/download/jyvfa/?view_only=92190681e4134f6798f1105ff63f7b56" -o ressources.zip 
-
+curl -L "https://osf.io/download/jyvfa/?view_only=92190681e4134f6798f1105ff63f7b56" -o resources.zip
+unzip resources.zip
 ```
 
 Once downloaded, extract the contents with:
@@ -29,12 +29,17 @@ To run the example with [uv](https://docs.astral.sh/uv/getting-started/installat
 ```bash
 uv run examples/main_shelf_slot_attention.py
 ```
-and
+Then open the link printed by `meshcat-server` (e.g. `http://127.0.0.1:7000`) in your browser to visualize the results.
 ```bash
 uv run meshcat-server
 ```
 
-And open the meschat link on your webbrowser.
+And open the meschat link on your web browser.
+
+If you've never used uv:
+```bash
+pip install uv
+```
 
 ## Docker
 
