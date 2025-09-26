@@ -10,7 +10,8 @@ The full dataset and additional resources are available via OSF at the following
 For direct command-line access:
 
 ```bash
-wget "https://osf.io/jsr7u/?view_only=92190681e4134f6798f1105ff63f7b56" -O ressources.zip
+ curl -L "https://osf.io/download/jyvfa/?view_only=92190681e4134f6798f1105ff63f7b56" -o ressources.zip 
+
 ```
 
 Once downloaded, extract the contents with:
