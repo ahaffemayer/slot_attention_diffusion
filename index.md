@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Collision-Free Model Predictive Control with Diffusion Model Warm-Starting
+title: Collision-Free Model Predictive Control Warm-Started with Diffusion Model
 
 ---
 
@@ -14,7 +14,7 @@ title: Collision-Free Model Predictive Control with Diffusion Model Warm-Startin
     preload="metadata"
     style="width:100%; height:auto; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.15); background:#000;"
   >
-    <source src="{{ '/static/RAL2025.mp4' | relative_url }}" type="video/mp4">
+    <source src="{{ '/static/RAL_2025.mp4' | relative_url }}" type="video/mp4">
     Your browser does not support the video tag.
   </video>
 </div>
@@ -23,12 +23,13 @@ title: Collision-Free Model Predictive Control with Diffusion Model Warm-Startin
 
 # Abstract
 
-Dynamic motion planning for complex robots in cluttered environments is essential for enabling robots to perform manipulation tasks in dynamic real-world settings. However, generating collision-free and dynamically feasible trajectories remains challenging due to the complexities of often non-convex environments and stringent constraints. To address this, we propose a novel hybrid framework that combines the strengths of data-driven diffusion models with model-based optimal control. Our approach leverages a diffusion model, conditioned on object-centric scene representations, to generate robust and generalizable trajectory priors across diverse environments. These learned priors are then refined within a Model Predictive Control (MPC) loop. This integrated approach ensures collision avoidance, dynamic feasibility, and improved performance by effectively blending learned trajectory generation with model-based planning. Experiments, conducted in simulation and on a real 7-DoF manipulator, demonstrate that our approach significantly improves success rates and constraint satisfaction in demanding, real-world settings, highlighting its effectiveness in dynamic motion planning.
+Acting in cluttered environments requires predicting and avoiding collisions while still achieving precise control. Conventional optimization-based controllers can enforce physical constraints, but they struggle to produce feasible solutions quickly when many obstacles are present. Diffusion models can generate diverse trajectories around obstacles, yet prior approaches lacked a general and efficient way to condition them on scene structure. In this paper, we show that combining diffusion-based warm-starting with a collision-aware model predictive controller (MPC) yields reliable and efficient motion generation under strict time limits. Our approach conditions a diffusion transformer on the system state, task, and surroundings, using an object-centric slot attention mechanism to provide a compact obstacle representation suitable for control. The sampled trajectories are refined by an optimal control problem that enforces rigid-body dynamics and signed-distance collision constraints, producing feasible motions in real time. On benchmark tasks, this hybrid method achieved markedly higher success rates and lower latency than sampling-based planners or either component alone. Real-robot experiments with a torque-controlled Panda confirm reliable and safe execution with MPC.
+
 
 # Method
 
 <div style="text-align:center;">
-  <img src="static/pipeline.png" width="720" alt="Architecture diagram" style="border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+  <img src="static/overview.png" width="720" alt="Architecture diagram" style="border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
   <p style="font-size:14px; color:gray; margin-top:5px;">
     Figure 1: Overview of our proposed architecture.
   </p>
@@ -64,7 +65,7 @@ The benchmark environments are divided into three difficulty levels based on the
 ## Comparison of the different conditioning methods
 
 <div style="text-align:center;">
-  <img src="static/condition_comparison.png" width="720" alt="Conditioning comparison" style="border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+  <img src="static/condition_comparison_no_col.png" width="720" alt="Conditioning comparison" style="border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
   <p style="font-size:14px; color:gray; margin-top:5px;">
     Figure 2: Comparing the different conditioning methods.
   </p>
@@ -113,12 +114,12 @@ The experiments were done on a Franka Emika Panda manipulator.
 <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
 
   <video autoplay loop muted playsinline width="320" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-    <source src="static/scene_1_to_1_final.mp4" type="video/mp4">
+    <source src="static/blurred_exp_1.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
 
   <video autoplay loop muted playsinline width="320" style="border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-    <source src="static/scene_3_final.mp4" type="video/mp4">
+    <source src="static/blurred_exp_3.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
   </div>
