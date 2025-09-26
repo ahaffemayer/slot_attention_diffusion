@@ -29,10 +29,11 @@ To run the example with [uv](https://docs.astral.sh/uv/getting-started/installat
 ```bash
 uv run examples/main_shelf_slot_attention.py
 ```
-Then open the link printed by `meshcat-server` (e.g. `http://127.0.0.1:7000`) in your browser to visualize the results.
+In a separate terminal, start the meshcat server:
 ```bash
 uv run meshcat-server
 ```
+Then open the link printed by `meshcat-server` (e.g. `http://127.0.0.1:7000`) in your browser to visualize the results.
 
 And open the meschat link on your web browser.
 
