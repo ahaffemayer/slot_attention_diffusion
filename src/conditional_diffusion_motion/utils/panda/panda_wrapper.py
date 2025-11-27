@@ -26,7 +26,7 @@ def load_reduced_panda():
     rmodel, geometric_models_reduced = pin.buildReducedModel(
         rmodel,
         list_of_geom_models=geom_models,
-        list_of_joints_to_lock=[7, 8],
+        list_of_joints_to_lock=[8, 9],
         reference_configuration=np.array([-0.6513877410293797, 1.3677075286603906, -0.17736737718858037, -0.3973375018143172, -0.11554961778792178, 1.2408486160482337, 8.644879755868687e-05, 0.0, 0.0])
     )
     
