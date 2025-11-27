@@ -18,8 +18,8 @@ def sample_box(low, high, n):
     return low + np.random.rand(n, 3) * (high - low)
 
 
-n_pairs = 30
-scene = 3
+n_pairs = 10
+scene = 5
 data_dir = Path(__file__).parent.parent / "ressources" / "shelf_example"
 
 yaml_path = data_dir / "config" / "scenes.yaml"
@@ -53,10 +53,10 @@ with Progress() as progress:
             continue  # skip this sample entirely
 
         vis.display(q_rand)
-        p_ee = rdata.oMf[rmodel.getFrameId("panda_hand_tcp")].translation
-        add_sphere_to_viewer(vis, f"starting_{len(p_ee_list)}", 0.03, p_ee, color=0x0000FF)
+        p_ee = rdata.oMf[rmodel.getFrameId("panda_hand_tcp")].translation.copy()
+        add_sphere_to_viewer(vis, f"sample_{len(p_ee_list)}", 0.03, p_ee, color=0x0000FF)
         p_ee_list.append(p_ee)
-        q_list.append(q_rand)
+        q_list.append(q_rand.copy())
         progress.update(task, advance=1)    
 
 
@@ -70,8 +70,8 @@ if scene == 3:
     boxB = sample_box([0.2, 0.5, 0.6], [0.6, 0.7, 0.9], nB)
 
     p_ee_list = [p for p in boxA] + [p for p in boxB]
-    for i, pos in enumerate(p_ee_list):
-        add_sphere_to_viewer(vis, f"p_ee_{i}", 0.03, pos, color=0x006400)
+    # for i, pos in enumerate(p_ee_list):
+    #     add_sphere_to_viewer(vis, f"p_ee_{i}", 0.03, pos, color=0x006400)
 
 
 # OCP refinement
@@ -86,7 +86,9 @@ with Progress() as progress:
 
     for j in range(len(q_list)):               # for each start config
         q0 = q_list[j]                         # this is now the start
-
+        pin.framesForwardKinematics(rmodel, rdata, q0)
+        p_start = rdata.oMf[rmodel.getFrameId("panda_hand_tcp")].translation
+        add_sphere_to_viewer(vis, f"starting_{j}", 0.03, p_start, color=0x000000) # Black sphere at start
         for i in range(len(p_ee_list)):        # try each goal
             p_goal = p_ee_list[i]
 
@@ -107,7 +109,11 @@ with Progress() as progress:
 
             Qs = [xs[:rmodel.nq] for xs in ocp.xs]
             success = compute_success(rmodel, rdata, cmodel, cdata, Qs, p_goal)
+            add_sphere_to_viewer(vis, f"goal_{i}", 0.03, p_goal, color=0xFF0000) # Red sphere at goal
 
+            for x in ocp.xs:
+                vis.display(x[:rmodel.nq])
+                time.sleep(0.05)
             if success:
                 n_success += 1
 
