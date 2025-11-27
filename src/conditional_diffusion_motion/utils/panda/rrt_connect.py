@@ -8,7 +8,7 @@ class Node:
         self.parent = parent
         self.cost = cost
 
-class RRTStarConnect:
+class RRTConnect:
     def __init__(self, rmodel, rdata, cmodel, cdata, step_size=0.1, max_iter=1000, neighbor_radius=0.2):
         self.rmodel = rmodel
         self.rdata = rdata
@@ -180,7 +180,7 @@ if __name__ == "__main__":
     add_sphere_to_viewer(vis, "goal_sphere", 0.02, p_goal, color=0xFF0000)
     
     
-    planner = RRTStarConnect(robot_model, robot_data, cmodel, collision_data, step_size=0.1, max_iter=1000)
+    planner = RRTConnect(robot_model, robot_data, cmodel, collision_data, step_size=0.1, max_iter=1000)
     t = time.time()
 
     path = planner.plan(q_start, p_goal)
