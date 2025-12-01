@@ -259,7 +259,7 @@ if __name__ == "__main__":
     cmodel_shelf, vmodel_shelf, rmodel_shelf, cmodel = box_env.create_model_with_obstacles(cmodel, num_obstacles=3)
     box_env.add_collision_pairs_with_boxes(cmodel, robot_links)
 
-    vis = create_viewer(rmodel, cmodel, vmodel)
+    vis = create_viewer(rmodel, cmodel_shelf, vmodel_shelf)
     box_env.setup_cam(vis)
 
     robot_data = rmodel.createData()
