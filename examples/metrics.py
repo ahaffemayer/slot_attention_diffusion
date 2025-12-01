@@ -28,8 +28,13 @@ def compute_success(rmodel, rdata, cmodel, cdata, traj, target):
     Compute the success of the trajectory.
     The trajectory is successful if it ends in the target configuration and it is collision-free.
     """
-
-    for q in traj:
+    interpolated_traj = []
+    for i in range(len(traj) - 1):
+        for j in np.arange(0, 1, 0.1):
+            qs = pin.interpolate(rmodel, traj[i], traj[i + 1], j)
+            interpolated_traj.append(qs)
+        
+    for q in interpolated_traj:
         pin.framesForwardKinematics(rmodel, rdata, q)
         pin.updateGeometryPlacements(rmodel, rdata, cmodel, cdata)
         if pin.computeCollisions(cmodel, cdata, stop_at_first_collision=True):
