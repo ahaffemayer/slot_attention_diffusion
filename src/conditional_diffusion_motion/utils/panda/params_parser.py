@@ -87,9 +87,12 @@ class ParamParser:
             obs_geom = pin.GeometryObject(
                 obs, 0, obs_id_frame, rmodel.frames[obs_id_frame].placement, obs_hppfcl
             )
-            obs_geom.meshColor = np.concatenate(
-                (np.random.rand(3), np.array([0.7]))
-            )
+            if "color" in self.data["OBSTACLES"][obs]:
+                obs_geom.meshColor = np.array(self.data["OBSTACLES"][obs]["color"])
+            else:
+                obs_geom.meshColor = np.concatenate(
+                    (np.random.rand(3), np.array([0.7]))
+                )
             _ = cmodel.addGeometryObject(obs_geom)
 
         for col in self.data["collision_pairs"]:
