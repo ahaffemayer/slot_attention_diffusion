@@ -62,7 +62,7 @@ class BoxEnv:
         
         vis.viewer["/Cameras/default"].set_transform(np.array(cam_pose))
 
-    def create_model_with_obstacles(self, cmodel_full, num_obstacles=3) -> Tuple[pin.GeometryModel, pin.GeometryModel, pin.Model, pin.GeometryModel]:
+    def create_model_with_obstacles(self, cmodel_full, num_obstacles=3, for_slot = False) -> Tuple[pin.GeometryModel, pin.GeometryModel, pin.Model, pin.GeometryModel]:
         # Add shelf objects to robot’s models
         self.dummy_cmodel = pin.GeometryModel()
         self.dummy_vmodel = pin.GeometryModel()
@@ -71,7 +71,10 @@ class BoxEnv:
         rmodel_dummy = self._create_dummy_robot()
         
         # Create the random obstacles
-        cmodel_full, self.dummy_cmodel = self.add_random_obstacles(cmodel_full, self.dummy_cmodel, num_obstacles=num_obstacles)
+        if for_slot:
+            cmodel_full, self.dummy_cmodel = self.add_random_obstacles_for_slots(cmodel_full, self.dummy_cmodel, num_obstacles=num_obstacles)
+        else:
+            cmodel_full, self.dummy_cmodel = self.add_random_obstacles(cmodel_full, self.dummy_cmodel, num_obstacles=num_obstacles)
         cmodel_full, self.dummy_cmodel = self.add_wall_and_table(cmodel_full, self.dummy_cmodel)
 
         return self.dummy_cmodel, self.dummy_vmodel, rmodel_dummy, cmodel_full
@@ -146,6 +149,7 @@ class BoxEnv:
             [1,0,0,1], [0,1,0,1], [0,0,1,1], [1,1,0,1],
             [1,0,1,1], [0,1,1,1],
         ]
+        colors_available = colors.copy()
 
         # Pre-fetch IDs for speed and safety
         link_ids = {}
@@ -156,6 +160,10 @@ class BoxEnv:
             link_ids[link] = cmodel_full.getGeometryId(link)
 
         for i in range(num_obstacles):
+
+            # Selecting the color
+            color = random.choice(colors_available)
+            colors_available.remove(color)
 
             obstacle_obj = None
 
@@ -172,7 +180,129 @@ class BoxEnv:
 
                 name = f"slot_obstacle_{i}"
                 obj = pin.GeometryObject(name, 0, 0, pose, shape)
-                obj.meshColor = np.array(colors[i % len(colors)])
+                obj.meshColor = np.array(color)
+
+                # Check collision against base links
+                collision = False
+                for link, gid in link_ids.items():
+                    # print(f"Checking collision between obstacle {name} and link {link}")
+                    collision_geom = cmodel_full.geometryObjects[gid]
+
+                    req = hppfcl.CollisionRequest()
+                    res = hppfcl.CollisionResult()
+
+                    r1 = hppfcl.CollisionObject(
+                        collision_geom.geometry, 
+                        pin_to_fcl(collision_geom.placement)
+                    )
+                    r2 = hppfcl.CollisionObject(
+                        obj.geometry,
+                        pin_to_fcl(obj.placement)
+                    )
+
+                    hppfcl.collide(r1, r2, req, res)
+                    if res.isCollision():
+                        collision = True
+                        break
+
+                if not collision:
+                    obstacle_obj = obj
+                    for prev_obj in accepted_obstacles:
+                        req2 = hppfcl.CollisionRequest()
+                        res2 = hppfcl.CollisionResult()
+
+                        r_prev = hppfcl.CollisionObject(prev_obj.geometry,
+                                                        pin_to_fcl(prev_obj.placement))
+                        r_new  = hppfcl.CollisionObject(obj.geometry,
+                                                        pin_to_fcl(obj.placement))
+
+                        hppfcl.collide(r_prev, r_new, req2, res2)
+
+                        if res2.isCollision():
+                            collision = True
+                            break
+
+                    print(f"[Info] Placed obstacle {i} at {pos} after {_+1} tries.")
+                    break  # got a valid sample
+
+            if obstacle_obj is None:
+                print(f"[Warning] Could not place obstacle {i} after {max_tries} tries.")
+                continue
+
+            # Add obstacle to both collision and visual models
+            cmodel_full.addGeometryObject(obstacle_obj)
+            dummy_cmodel.addGeometryObject(obstacle_obj)
+            accepted_obstacles.append(obstacle_obj.copy())
+            # Save metadata
+            self._record_obstacle(obstacle_obj)
+
+        return cmodel_full, dummy_cmodel
+
+
+
+    def add_random_obstacles_for_slots(self, cmodel_full, dummy_cmodel, num_obstacles):
+        """
+        Generate random obstacles within given boundaries and ensure they do NOT
+        collide with the robot base links. Retries until a valid sample is found.
+        """
+        robot_base_links = [
+            "panda_link0_capsule_0",
+            "panda_link1_capsule_0",
+            "panda_link2_capsule_0",
+            "panda_link3_capsule_0",
+        ]
+        accepted_obstacles = []
+        if num_obstacles <= 0:
+            print("[Warning] No obstacles to add.")
+            return cmodel_full, dummy_cmodel
+        if num_obstacles > 3:
+            raise ValueError("Too many obstacles, keep it <= 3.")
+
+        box_dim = [0.35, 0.1,0.4]
+        x_fixed = [0.55, 0.5, 0.4]
+        y_fixed = [0.2, -0.2, 0.0]
+        z_min, z_max = 0.3, 0.7
+        max_tries = 50  # Allow enough retries
+        noise_xy = 0.1 
+        colors = [
+            [1,0,0,1], [0,1,0,1], [0,0,1,1], [1,1,0,1],
+            [1,0,1,1], [0,1,1,1],
+        ]
+        colors_available = colors.copy()
+
+        # Pre-fetch IDs for speed and safety
+        link_ids = {}
+        for link in robot_base_links:
+            if not cmodel_full.existGeometryName(link):
+                print(f"[Warning] Link '{link}' not found in geometry model.")
+                continue
+            link_ids[link] = cmodel_full.getGeometryId(link)
+
+        for i in range(num_obstacles):
+
+            # Selecting the color
+            color = random.choice(colors_available)
+            colors_available.remove(color)
+
+            obstacle_obj = None
+
+            for _ in range(max_tries):
+
+                # Position
+                z = random.uniform(z_min, z_max)
+                x = x_fixed[i] + random.uniform(-noise_xy, noise_xy)
+                y = y_fixed[i] + random.uniform(-noise_xy, noise_xy)
+
+                pos = np.array([x, y, z])
+
+                pose = pin.SE3(np.eye(3), pos)
+
+                # Shape
+                shape = hppfcl.Box(*box_dim)
+
+                name = f"slot_obstacle_{i}"
+                obj = pin.GeometryObject(name, 0, 0, pose, shape)
+                obj.meshColor = np.array(color)
 
                 # Check collision against base links
                 collision = False
@@ -229,7 +359,6 @@ class BoxEnv:
             self._record_obstacle(obstacle_obj)
 
         return cmodel_full, dummy_cmodel
-
 
 
 def pin_to_fcl(pose: pin.SE3) -> hppfcl.Transform3f:
