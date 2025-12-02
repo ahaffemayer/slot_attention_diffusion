@@ -20,7 +20,7 @@ from conditional_diffusion_motion.utils.panda.params_parser import ParamParser
 # -----------------------------
 # Configuration
 # -----------------------------
-OUTPUT_DIR = Path("generated_scenes/table_scenes")
+OUTPUT_DIR = Path("/home/arthur/Desktop/Code/slot_attention_diffusion/ressources/table_example/generated_scenes/table_scenes")
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 N_SCENES = 1000  # Number of scenes to generate
@@ -40,7 +40,7 @@ def generate_shelf_only_scene(scene_idx: int):
 
     pp = ParamParser(str(yaml_path), scene)
     box_env = BoxEnv()
-    cmodel_shelf, vmodel_shelf, rmodel_shelf, cmodel = box_env.create_model_with_obstacles(cmodel, num_obstacles=np.random.randint(*OBSTACLE_RANGE))
+    cmodel_shelf, vmodel_shelf, rmodel_shelf, cmodel = box_env.create_model_with_obstacles(cmodel, num_obstacles=np.random.randint(*OBSTACLE_RANGE), for_slot=True)
 
     vis = create_viewer(rmodel, cmodel_shelf, vmodel_shelf)
     box_env.setup_cam(vis)
