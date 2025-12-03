@@ -1,0 +1,1 @@
+python ../../../src/conditional_diffusion_motion/diffusion_transformer/trainings/slot_attention/fit_indirect_motion_with_obstacles_with_box_slot_attention.py fit --config config/gpu_config_box_slot_attention.yaml
