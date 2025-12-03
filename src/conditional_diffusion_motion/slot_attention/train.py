@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--model_dir', default='./tmp/model1000.ckpt', type=str, help='where to save models')
 parser.add_argument('--seed', default=0, type=int, help='random seed')
 parser.add_argument('--batch_size', default=16, type=int)
-parser.add_argument('--num_slots', default=6, type=int, help='Number of slots in Slot Attention.')
+parser.add_argument('--num_slots', default=4, type=int, help='Number of slots in Slot Attention.')
 parser.add_argument('--num_iterations', default=3, type=int, help='Number of attention iterations.')
 parser.add_argument('--hid_dim', default=64, type=int, help='hidden dimension size')
 parser.add_argument('--learning_rate', default=0.0004, type=float)
@@ -51,10 +51,10 @@ train_loader = torch.utils.data.DataLoader(
 # -----------------------------------
 model = SlotAttention(
     input_shape=resolution,
-    num_slots= 4, # opt.num_slots,,
+    num_slots= opt.num_slots,
     # slot_size=opt.hid_dim,
     # hidden_dim=opt.hid_dim * 8,
-    num_iters=3,     # opt.num_iterations,
+    num_iters=opt.num_iterations,
     num_channels=3,
 ).to(device)
 

@@ -9,20 +9,22 @@ import random
 # Set device
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # Load dataset
-ressource_dir = Path(__file__).parent.parent.parent.parent / 'ressources' / 'shelf_example'
-image_dir = ressource_dir / 'generated_scenes' / 'shelf_for_training_slot_attention'
+# /home/arthur/Desktop/Code/slot_attention_diffusion/ressources/table_example/generated_scenes/table_scenes/             
+
+ressource_dir = Path(__file__).parent.parent.parent.parent / 'ressources' / 'table_example'
+image_dir = ressource_dir / 'generated_scenes' / 'table_scenes'
 dataset = PARTNET(split='train', image_dir=image_dir)  # Should return (B, C, H, W)
-# img_index = random.randint(0, len(dataset) - 1)
-img_index = 334
+img_index = random.randint(0, len(dataset) - 1)
+# img_index = 1
 sample = dataset[img_index]
 image = sample['image'].unsqueeze(0).to(device)  # Add batch dim
 print(f"img index: {img_index}")
 # Load model
 resolution = (128, 128)
-num_slots = 6
+num_slots = 4
 num_iterations = 3
 hid_dim = 64
-model_dir = ressource_dir / "slot_attention" / "model_slot_attention" / 'slot_attention_shelf.ckpt'
+model_dir = ressource_dir / "slot_attention" / "model_slot_attention" / 'model1000.ckpt'
 
 model = SlotAttention(
     input_shape=resolution,
@@ -141,21 +143,21 @@ plt.show()
 
 
 # Define which masks to display
-# selected_slots = [0, 1, 4]  # example: show only masks for slots 0, 2, and 4
+selected_slots = [0, 1, 3]  # example: show only masks for slots 0, 2, and 4
 
-# # Prepare figure: 1 row (original + masks), columns = 1 + len(selected_slots)
-# fig, axs = plt.subplots(1, len(selected_slots) + 1, figsize=(3 * (len(selected_slots) + 1), 3))
+# Prepare figure: 1 row (original + masks), columns = 1 + len(selected_slots)
+fig, axs = plt.subplots(1, len(selected_slots) + 1, figsize=(3 * (len(selected_slots) + 1), 3))
 
-# # Original image
-# axs[0].imshow(input_img)
-# # axs[0].set_title("Original Image")
-# axs[0].axis('off')
+# Original image
+axs[0].imshow(input_img)
+# axs[0].set_title("Original Image")
+axs[0].axis('off')
 
-# # Plot selected masks
-# for idx, i in enumerate(selected_slots):
-#     axs[idx + 1].imshow(slot_masks[i].squeeze(), cmap='gray')
-#     # axs[idx + 1].set_title(f"Mask {i}")
-#     axs[idx + 1].axis('off')
+# Plot selected masks
+for idx, i in enumerate(selected_slots):
+    axs[idx + 1].imshow(slot_masks[i].squeeze(), cmap='gray')
+    # axs[idx + 1].set_title(f"Mask {i}")
+    axs[idx + 1].axis('off')
 
-# plt.tight_layout()
-# plt.show()
+plt.tight_layout()
+plt.show()
