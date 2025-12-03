@@ -18,12 +18,12 @@ if __name__ == "__main__":
     from rich.progress import Progress
 
     rmodel, cmodel, vmodel = load_reduced_panda()
-    scene_path = Path("")
-    configurations_path = Path("")
+    scene_path = Path("/home/arthur/Desktop/Code/slot_attention_diffusion/ressources/table_example/generated_scenes/box_for_diffusion/scenes_data.json")
+    configurations_path = Path("/home/arthur/Desktop/Code/slot_attention_diffusion/ressources/table_example/cspace/c_space_configuration_vectors/cspace_configurations.npy")
     configurations = np.load(configurations_path, allow_pickle=True)
 
-    occupancy_tensor_path =  f""
-    cspace_path = f""
+    # occupancy_tensor_path =  f""
+    cspace_path = f"/home/arthur/Desktop/Code/slot_attention_diffusion/ressources/table_example/processed_datasets/indirect_motion_with_obstacles_cache_with_shelf_cspace.npy"
 
     tensors_grid_results = []
     cspace_results = []
@@ -46,14 +46,14 @@ if __name__ == "__main__":
                 cmodel.addGeometryObject(geom)
             add_collision_pairs_with_obstacles(cmodel, robot_links)
             q = pin.neutral(rmodel)
-            grid = OccupancyGrid3D(
-                x_min=0.4, x_max=1.2,
-                y_min=-0.8, y_max=0.8,
-                z_min=-0.2, z_max=1.0,
-                resolution=0.05
-            )
+            # grid = OccupancyGrid3D(
+            #     x_min=0.4, x_max=1.2,
+            #     y_min=-0.8, y_max=0.8,
+            #     z_min=-0.2, z_max=1.0,
+            #     resolution=0.05
+            # )
 
-            tensors_grid_results.append(grid.generate_binary_occupancy_tensor(collision_model=cmodel))
+            # tensors_grid_results.append(grid.generate_binary_occupancy_tensor(collision_model=cmodel))
 
             cspace = CSpace(rmodel=rmodel, cmodel=cmodel)
             cspace_result = []
@@ -69,8 +69,8 @@ if __name__ == "__main__":
             print(f"Scene {scene_name} processed. {len(cspace_result) - sum(cspace_result)} / {len(cspace_result)} valid configurations.")
 
 
-    np.save(occupancy_tensor_path,tensors_grid_results, allow_pickle=True) 
+    # np.save(occupancy_tensor_path,tensors_grid_results, allow_pickle=True) 
     np.save(cspace_path, cspace_results, allow_pickle=True)
     
-    print(f"Occupancy grid tensors saved to {occupancy_tensor_path}")
+    # print(f"Occupancy grid tensors saved to {occupancy_tensor_path}")
     print(f"C-space validity vectors saved to {cspace_path}")
