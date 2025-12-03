@@ -3,7 +3,7 @@ import numpy as np
 import pinocchio as pin
 
 robot_links = [
-    "panda_link0_capsule_0",
+    # "panda_link0_capsule_0",
     "panda_hand_capsule_0",
     "panda_link7_capsule_0",
     "panda_link7_capsule_1",
