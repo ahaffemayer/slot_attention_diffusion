@@ -1,0 +1,5 @@
+data:
+  data_dir: /home/ahaffemaye/slot_attention_diffusion/ressources/table_example
+trainer:  
+  max_epochs: 3000
+  default_root_dir: /home/ahaffemaye/slot_attention_diffusion/ressources/table_example/cspace/diffusion/
