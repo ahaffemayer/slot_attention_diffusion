@@ -38,7 +38,7 @@ resolution = (128, 128)
 # -----------------------------------
 # Dataset
 # -----------------------------------
-image_dir = Path(__file__).parent.parent.parent.parent / 'ressources' / 'table_example' / 'generated_scenes' / 'table_scenes'
+image_dir = Path(__file__).parent.parent.parent.parent / 'ressources' / 'drawer_example' / 'generated_scenes' / 'drawer_scenes'
 train_set = PARTNET('train', image_dir=image_dir)  # Should return (B, C, H, W)
 train_loader = torch.utils.data.DataLoader(
     train_set,
