@@ -1,0 +1,1 @@
+python ../../../src/conditional_diffusion_motion/diffusion_transformer/trainings/without_cond/fit_indirect_motion_with_obstacles_without_cond_box.py fit --config config/gpu_config_without_cond.yaml
