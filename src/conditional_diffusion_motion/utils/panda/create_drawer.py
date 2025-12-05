@@ -5,7 +5,7 @@ import hppfcl
 import random
 
 
-class SphereEnv:
+class DrawerEnv:
     def __init__(self):
         self._obstacle_names = []
         self._obstacle_positions = []
@@ -44,11 +44,9 @@ class SphereEnv:
 
         return self._cmodel_scene, self._vmodel_scene
 
-    def setup_cam(self, vis):
-
+    def setup_cam(self, vis):        
         
-        
-        roll, pitch, yaw = 0, 90, 0
+        roll, pitch, yaw = 0, -25, 135
 
         # Rotation matrix from roll, pitch, yaw
         R_roll  = pin.utils.rotate('x', roll)
@@ -58,13 +56,13 @@ class SphereEnv:
         # Combine rotations: R = Rz * Ry * Rx
     
         cam_pose = pin.SE3.Identity()
-        cam_pose.translation = np.array([ 0,0,2])
+        cam_pose.translation = np.array([ 2.2,-0.5,-0.5])
         # cam_pose.rotation = np.eye(3)
         cam_pose.rotation = R_yaw @ R_pitch @ R_roll
         
         vis.viewer["/Cameras/default"].set_transform(np.array(cam_pose))
 
-    def create_model_with_obstacles(self, cmodel_full, num_obstacles=4) -> Tuple[pin.GeometryModel, pin.GeometryModel, pin.Model, pin.GeometryModel]:
+    def create_model_with_obstacles(self, cmodel_full, num_obstacles=3, for_slot = False) -> Tuple[pin.GeometryModel, pin.GeometryModel, pin.Model, pin.GeometryModel]:
         # Add shelf objects to robot’s models
         self.dummy_cmodel = pin.GeometryModel()
         self.dummy_vmodel = pin.GeometryModel()
@@ -73,7 +71,8 @@ class SphereEnv:
         rmodel_dummy = self._create_dummy_robot()
         
         # Create the random obstacles
-        cmodel_full, self.dummy_cmodel = self.add_random_obstacles(cmodel_full, self.dummy_cmodel, num_obstacles=num_obstacles)
+        cmodel_full, self.dummy_cmodel = self.add_random_obstacles_for_slots(cmodel_full, self.dummy_cmodel, num_obstacles=num_obstacles)
+        cmodel_full, self.dummy_cmodel = self.add_walls_and_table(cmodel_full, self.dummy_cmodel)
 
         return self.dummy_cmodel, self.dummy_vmodel, rmodel_dummy, cmodel_full
 
@@ -89,11 +88,68 @@ class SphereEnv:
     # OBSTACLE GENERATION
     # ===============================================================
 
+    def add_walls_and_table(self, cmodel_full, dummy_cmodel):
+        obstacles = {
+            "obstacle1": {
+                "dim": [1.2, 0.7, 0.3],
+                "translation": [0.3, 0.0, -0.1],
+                "orientation": [0.0, 0.0, 0.0, 1.0],
+                "color": [0.5, 0.5, 0.5, 1.0]
+            },
+            "obstacle2": {
+                "dim": [0.5, 0.6, 0.03],
+                "translation": [0.65, 0.0, 0.8],
+                "orientation": [0.0, 0.0, 0.0, 1.0],
+                "color": [0.5, 0.5, 0.5, 1.0]
+            },
+            "obstacle3": {
+                "dim": [0.03, 0.6, 0.75],
+                "translation": [0.9, 0.0, 0.42],
+                "orientation": [0.0, 0.0, 0.0, 1.0],
+                "color": [0.5, 0.5, 0.5, 1.0]
+            },
+            "obstacle4": {
+                "dim": [0.5, 0.03, 0.75],
+                "translation": [0.65, 0.3, 0.42],
+                "orientation": [0.0, 0.0, 0.0, 1.0],
+                "color": [0.5, 0.5, 0.5, 1.0]
+            },
+            "obstacle5": {
+                "dim": [0.5, 0.03, 0.75],
+                "translation": [0.65, -0.3, 0.42],
+                "orientation": [0.0, 0.0, 0.0, 1.0],
+                "color": [0.5, 0.5, 0.5, 1.0]
+            }
+        }
+
+        for name, params in obstacles.items():
+            size_x, size_y, size_z = params["dim"]
+            shape = hppfcl.Box(size_x, size_y, size_z)
+
+            quat = params["orientation"]
+            R = pin.Quaternion(quat[3], quat[0], quat[1], quat[2]).toRotationMatrix()
+
+            pose = pin.SE3(
+                R,
+                np.array(params["translation"])
+            )
+
+            obj = pin.GeometryObject(name, 0, 0, pose, shape)
+            obj.meshColor = np.array(params["color"])
+
+            cmodel_full.addGeometryObject(obj)
+            dummy_cmodel.addGeometryObject(obj)
+            self._record_obstacle(obj)
+
+        return cmodel_full, dummy_cmodel
+
+
     def _record_obstacle(self, geom_obj: pin.GeometryObject):
         self._obstacle_names.append(geom_obj.name)
         self._obstacle_positions.append(np.copy(geom_obj.placement.translation))
 
-    def add_random_obstacles(self, cmodel_full, dummy_cmodel, num_obstacles):
+
+    def add_random_obstacles_for_slots(self, cmodel_full, dummy_cmodel, num_obstacles):
         """
         Generate random obstacles within given boundaries and ensure they do NOT
         collide with the robot base links. Retries until a valid sample is found.
@@ -108,21 +164,18 @@ class SphereEnv:
         if num_obstacles <= 0:
             print("[Warning] No obstacles to add.")
             return cmodel_full, dummy_cmodel
-        if num_obstacles > 4:
-            raise ValueError("Too many obstacles, keep it <= 4.")
+        if num_obstacles > 3:
+            raise ValueError("Too many obstacles, keep it <= 3.")
 
-        self._obstacle_names = []
-        self._obstacle_positions = []
-
-        box_dim = [0.05, 0.7, 1.2]
-        z_fixed = 0.67
-        xy_min, xy_max = -0.6, 0.6
+        box_dim = [0.03, 0.6,0.07]
+        x_fixed, y_fixed = 0.4, 0 
+        z_min, z_max = 0.1, 0.7
         max_tries = 50  # Allow enough retries
-
         colors = [
             [1,0,0,1], [0,1,0,1], [0,0,1,1], [1,1,0,1],
             [1,0,1,1], [0,1,1,1],
         ]
+        colors_available = colors.copy()
 
         # Pre-fetch IDs for speed and safety
         link_ids = {}
@@ -134,29 +187,25 @@ class SphereEnv:
 
         for i in range(num_obstacles):
 
+            # Selecting the color
+            color = random.choice(colors_available)
+            colors_available.remove(color)
+
             obstacle_obj = None
 
             for _ in range(max_tries):
 
                 # Position
-                x = random.uniform(xy_min, xy_max)
-                y = random.uniform(xy_min, xy_max)
-                pos = np.array([x, y, z_fixed])
-
-                # Rotation around X axis
-                angle = random.uniform(0, 2*np.pi)
-                s, c = np.sin(angle / 2), np.cos(angle / 2)
-                quat = np.array([0.0, 0.0, s, c])  # xyzw
-
-                rot = pin.Quaternion(quat).toRotationMatrix()
-                pose = pin.SE3(rot, pos)
+                z = random.uniform(z_min, z_max)
+                pos = np.array([x_fixed, y_fixed, z])
+                pose = pin.SE3(np.eye(3), pos)
 
                 # Shape
                 shape = hppfcl.Box(*box_dim)
 
                 name = f"slot_obstacle_{i}"
                 obj = pin.GeometryObject(name, 0, 0, pose, shape)
-                obj.meshColor = np.array(colors[i % len(colors)])
+                obj.meshColor = np.array(color)
 
                 # Check collision against base links
                 collision = False
@@ -215,7 +264,6 @@ class SphereEnv:
         return cmodel_full, dummy_cmodel
 
 
-
 def pin_to_fcl(pose: pin.SE3) -> hppfcl.Transform3f:
     return hppfcl.Transform3f(pose.rotation, pose.translation)
 
@@ -224,28 +272,34 @@ if __name__ == "__main__":
     # Simple test of the environment creation
     from conditional_diffusion_motion.utils.panda.panda_wrapper import load_reduced_panda, robot_links
     from conditional_diffusion_motion.utils.panda.visualizer import create_viewer
-    from conditional_diffusion_motion.utils.panda.create_boxes_spheres_env import SphereEnv
+    from conditional_diffusion_motion.utils.panda.params_parser import ParamParser
+    from pathlib import Path
     import pinocchio as pin
 
+    scene = 7
+
+    yaml_path = "/home/arthur/Desktop/Code/slot_attention_diffusion/ressources/shelf_example/config/scenes.yaml"
+
     rmodel, cmodel, vmodel = load_reduced_panda()
-    sphere_env = SphereEnv()
-    cmodel_shelf, vmodel_shelf, rmodel_shelf, cmodel = sphere_env.create_model_with_obstacles(cmodel, num_obstacles=4)
-    sphere_env.add_collision_pairs_with_boxes(cmodel, robot_links)
 
-    vis = create_viewer(rmodel, cmodel, vmodel)
-    sphere_env.setup_cam(vis)
 
-    robot_data = rmodel.createData()
-    collision_data = cmodel.createData()
+    pp = ParamParser(str(yaml_path), scene)
 
-    pin.framesForwardKinematics(rmodel, robot_data, pin.randomConfiguration(rmodel))
+    # cmodel = pp.add_collisions(rmodel, cmodel)
+    print("Number of collision pairs:", len(cmodel.collisionPairs))   
+    drawer_env = DrawerEnv()
+    cmodel_shelf, vmodel_shelf, rmodel_shelf, cmodel = drawer_env.create_model_with_obstacles(cmodel, num_obstacles=3, for_slot=True)
+    drawer_env.add_collision_pairs_with_boxes(cmodel, robot_links)
+
+    # vis = create_viewer(rmodel, cmodel, vmodel)
+    vis = create_viewer(rmodel_shelf, cmodel_shelf, vmodel_shelf)
+    drawer_env.setup_cam(vis)
+
+    # robot_data = rmodel.createData()
+    # collision_data = cmodel.createData()
+
+    # pin.framesForwardKinematics(rmodel, robot_data, pin.randomConfiguration(rmodel))
+    # for cp in cmodel.collisionPairs:
+    #     print(cp)
 
     vis.display(pin.randomConfiguration(rmodel))
-    input("Press Enter to continue...")
-    camera = vis.viewer["/Cameras/default"]
-
-    # Get the current transform (4x4 matrix)
-    transform = camera.get_transform()  # returns a 4x4 numpy array
-
-    # Extract translation
-    position = transform[:3, 3]
