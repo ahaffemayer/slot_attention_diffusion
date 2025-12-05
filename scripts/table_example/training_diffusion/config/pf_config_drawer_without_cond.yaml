@@ -2,4 +2,4 @@ data:
   data_dir: /home/ahaffemaye/slot_attention_diffusion/ressources/drawer_example
 trainer:  
   max_epochs: 3000
-  default_root_dir: /home/ahaffemaye/slot_attention_diffusion/ressources/drawer_example/cspace/diffusion/
+  default_root_dir: /home/ahaffemaye/slot_attention_diffusion/ressources/drawer_example/without_cond/diffusion/

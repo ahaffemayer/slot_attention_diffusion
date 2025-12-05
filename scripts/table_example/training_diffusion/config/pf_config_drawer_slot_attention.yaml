@@ -1,0 +1,6 @@
+data:
+  data_dir: /home/ahaffemaye/slot_attention_diffusion/ressources/drawer_example
+  slot_attention_model_dir: /home/ahaffemaye/slot_attention_diffusion/ressources/drawer_example/slot_attention/model_slot_attention/slot_attention_drawer.ckpt
+trainer:  
+  max_epochs: 3000
+  default_root_dir: /home/ahaffemaye/slot_attention_diffusion/ressources/drawer_example/slot_attention/diffusion/
