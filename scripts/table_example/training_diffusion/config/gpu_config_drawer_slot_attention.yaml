@@ -1,0 +1,6 @@
+data:
+  data_dir: /home/arthur/Desktop/Code/slot_attention_diffusion/ressources/drawer_example
+  slot_attention_model_dir: /home/arthur/Desktop/Code/slot_attention_diffusion/ressources/drawer_example/slot_attention/model_slot_attention/slot_attention_drawer.ckpt
+trainer:
+  max_epochs: 1
+  default_root_dir: /home/arthur/Desktop/Code/slot_attention_diffusion/ressources/drawer_example/slot_attention/diffusion/
