@@ -1,0 +1,5 @@
+data:
+  data_dir: /home/arthur/Desktop/Code/slot_attention_diffusion/ressources/drawer_example
+trainer:
+  max_epochs: 1
+  default_root_dir: /home/arthur/Desktop/Code/slot_attention_diffusion/ressources/drawer_example/without_cond/diffusion/
